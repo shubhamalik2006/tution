@@ -40,6 +40,8 @@ const Icon = ({ name, size = 20 }) => {
     trash: <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
     loader: <svg style={{...s, animation: "spin 1s linear infinite"}} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
     google: <svg style={s} viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>,
+    apple: <svg style={s} viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.02 8.93 8.76c1.28.07 2.17.74 2.92.78.99-.2 1.94-.77 3-.83 1.28.1 2.25.59 2.88 1.52-2.64 1.58-2.01 5.07.37 6.04-.48 1.26-.71 1.84-1.38 2.96-.82 1.37-1.98 3.07-3.67 3.05zM12.03 8.7c-.15-2.34 1.84-4.38 4.03-4.55.3 2.63-2.34 4.6-4.03 4.55z"/></svg>,
+    phone: <svg style={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
   };
   return icons[name] || null;
 };
@@ -116,15 +118,43 @@ const css = `
     font-size: 12px; color: var(--ink-faint); font-weight: 500;
     margin-bottom: 28px;
   }
-  .google-btn {
+  .login-btn {
     width: 100%; padding: 12px 20px; border-radius: 10px;
     border: 1.5px solid var(--border); background: var(--surface);
     font-size: 15px; font-weight: 600; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 10px;
     transition: all 0.2s; font-family: inherit; color: var(--ink);
   }
-  .google-btn:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-1px); }
-  .google-btn:active { transform: translateY(0); }
+  .login-btn:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .login-btn:active { transform: translateY(0); }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .login-btn.apple-btn { background: #000; color: #fff; border-color: #000; }
+  .login-btn.apple-btn:hover { background: #1a1a1a; border-color: #333; }
+  .login-btns { display: flex; flex-direction: column; gap: 10px; }
+  .login-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0; font-size: 12px; color: var(--ink-faint); font-weight: 500;
+  }
+  .login-divider::before, .login-divider::after {
+    content: ""; flex: 1; height: 1px; background: var(--border);
+  }
+  .phone-form { text-align: left; }
+  .phone-form .form-input { margin-bottom: 10px; }
+  .phone-form .phone-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .phone-form .phone-row .form-input { flex: 1; }
+  .phone-form .otp-inputs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .phone-form .otp-inputs input {
+    width: 44px; height: 48px; text-align: center; font-size: 20px;
+    font-weight: 700; border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: inherit; background: var(--surface); color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .phone-form .otp-inputs input:focus { outline: none; border-color: var(--accent); }
+  .phone-back {
+    background: none; border: none; font-size: 13px; font-weight: 600;
+    color: var(--accent); cursor: pointer; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 4px; font-family: inherit;
+  }
   .login-footer {
     margin-top: 28px; font-size: 11px; color: var(--ink-faint); line-height: 1.6;
   }
@@ -408,27 +438,159 @@ function Modal({ children, onClose }) {
 }
 
 // ─── Login Page ───
-function LoginPage({ onLogin }) {
-  const [loading, setLoading] = useState(false);
+function LoginPage() {
+  const [loading, setLoading] = useState(null); // null | 'google' | 'apple' | 'phone'
   const [error, setError] = useState(null);
+  const [phoneStep, setPhoneStep] = useState(null); // null | 'enter' | 'otp'
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
+  const handleOAuthLogin = async (provider) => {
+    setLoading(provider);
     setError(null);
     const { error: authError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider,
       options: {
         redirectTo: window.location.origin,
       },
     });
     if (authError) {
       setError(authError.message);
-      setLoading(false);
+      setLoading(null);
     }
-    // On success, the page redirects to Google, then back.
-    // onAuthStateChange in the parent will pick up the session.
   };
 
+  const handleSendOtp = async () => {
+    const cleaned = phoneNumber.replace(/\s/g, "");
+    if (!/^\+\d{10,15}$/.test(cleaned)) {
+      setError("Enter a valid phone number with country code (e.g. +91XXXXXXXXXX)");
+      return;
+    }
+    setLoading("phone");
+    setError(null);
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      phone: cleaned,
+    });
+    if (otpError) {
+      setError(otpError.message);
+      setLoading(null);
+    } else {
+      setPhoneStep("otp");
+      setLoading(null);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const code = otp.join("");
+    if (code.length !== 6) {
+      setError("Enter the full 6-digit code");
+      return;
+    }
+    setLoading("phone");
+    setError(null);
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      phone: phoneNumber.replace(/\s/g, ""),
+      token: code,
+      type: "sms",
+    });
+    if (verifyError) {
+      setError(verifyError.message);
+      setLoading(null);
+    }
+    // On success, onAuthStateChange picks up the session
+  };
+
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) value = value.slice(-1);
+    if (value && !/^\d$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    // Auto-focus next input
+    if (value && index < 5) {
+      const next = document.getElementById(`otp-${index + 1}`);
+      if (next) next.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const prev = document.getElementById(`otp-${index - 1}`);
+      if (prev) prev.focus();
+    }
+  };
+
+  // ─── Phone OTP Screen ───
+  if (phoneStep === "enter" || phoneStep === "otp") {
+    return (
+      <div className="login-page">
+        <div className="login-card">
+          <div className="login-logo">
+            <Icon name="phone" size={28} />
+          </div>
+          <button className="phone-back" onClick={() => { setPhoneStep(null); setError(null); setOtp(["","","","","",""]); }}>
+            ← Back to login options
+          </button>
+
+          {phoneStep === "enter" ? (
+            <div className="phone-form">
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, marginBottom: 6, textAlign: "center" }}>Phone Login</h2>
+              <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 20, textAlign: "center" }}>
+                We'll send a 6-digit verification code via SMS.
+              </p>
+              {error && <div className="login-error">{error}</div>}
+              <label className="form-label">Phone Number</label>
+              <input
+                className="form-input"
+                type="tel"
+                placeholder="+91 98765 43210"
+                value={phoneNumber}
+                onChange={e => { setPhoneNumber(e.target.value); setError(null); }}
+                onKeyDown={e => e.key === "Enter" && handleSendOtp()}
+              />
+              <p style={{ fontSize: 11, color: "var(--ink-faint)", marginBottom: 16, marginTop: 4 }}>
+                Include country code (India: +91)
+              </p>
+              <button className="login-btn" onClick={handleSendOtp} disabled={loading === "phone"} style={{ background: "var(--accent)", color: "white", borderColor: "var(--accent)" }}>
+                {loading === "phone" ? <><Icon name="loader" size={16} /> Sending…</> : <><Icon name="send" size={16} /> Send Code</>}
+              </button>
+            </div>
+          ) : (
+            <div className="phone-form">
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, marginBottom: 6, textAlign: "center" }}>Enter Code</h2>
+              <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 20, textAlign: "center" }}>
+                Sent to <strong>{phoneNumber}</strong>
+              </p>
+              {error && <div className="login-error">{error}</div>}
+              <div className="otp-inputs" style={{ justifyContent: "center" }}>
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={e => handleOtpChange(i, e.target.value)}
+                    onKeyDown={e => handleOtpKeyDown(i, e)}
+                    autoFocus={i === 0}
+                  />
+                ))}
+              </div>
+              <button className="login-btn" onClick={handleVerifyOtp} disabled={loading === "phone"} style={{ background: "var(--accent)", color: "white", borderColor: "var(--accent)" }}>
+                {loading === "phone" ? <><Icon name="loader" size={16} /> Verifying…</> : <><Icon name="check" size={16} /> Verify & Sign In</>}
+              </button>
+              <button className="phone-back" onClick={() => { setPhoneStep("enter"); setOtp(["","","","","",""]); setError(null); }} style={{ marginTop: 14, justifyContent: "center", width: "100%" }}>
+                Didn't receive it? Resend code
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Main Login Screen ───
   return (
     <div className="login-page">
       <div className="login-card">
@@ -445,13 +607,17 @@ function LoginPage({ onLogin }) {
 
         {error && <div className="login-error">{error}</div>}
 
-        <button className="google-btn" onClick={handleGoogleLogin} disabled={loading}>
-          {loading ? (
-            <><Icon name="loader" size={18} /> Signing in…</>
-          ) : (
-            <><Icon name="google" size={20} /> Continue with Google</>
-          )}
-        </button>
+        <div className="login-btns">
+          <button className="login-btn" onClick={() => handleOAuthLogin("google")} disabled={loading === "google"}>
+            {loading === "google" ? <><Icon name="loader" size={18} /> Signing in…</> : <><Icon name="google" size={20} /> Continue with Google</>}
+          </button>
+
+          <div className="login-divider">or</div>
+
+          <button className="login-btn" onClick={() => { setPhoneStep("enter"); setError(null); }}>
+            <Icon name="phone" size={18} /> Continue with Phone
+          </button>
+        </div>
 
         <p className="login-footer">
           By continuing, you agree to our terms of service.<br />
