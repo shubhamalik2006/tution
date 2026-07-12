@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
-const supabase = createClient("https://kysjlotbqzgolirywtre.supabase.co", "sb_publishable_m4x_lZZYK0Ae1B1Bh9ZB7A_wOK0M6K0");
+const supabase = createClient("https://kysjlotbqzgolirywtre.supabase.co", "sb_publishable_m4x_lZZYK0Ae1B1Bh9ZB7A_wOK0M6K0", {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storageKey: "tutionhub-auth",
+  },
+});
 const ADMIN_PIN = "1234";
 const TUTOR_UNLOCK_FEE = 149;
 const AREA = "Faridabad – 121001";
