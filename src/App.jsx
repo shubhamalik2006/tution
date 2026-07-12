@@ -5,6 +5,7 @@ const ADMIN_PIN = "1234";
 const TUTOR_UNLOCK_FEE = 149;
 const AREA = "Faridabad – 121001";
 const ADMIN_WHATSAPP = "919871395272";
+const UPI_ID = "9871395272@bhim";
 
 const SUBJECTS = [
   "Mathematics", "Physics", "Chemistry", "Biology", "English",
@@ -447,6 +448,28 @@ const css = `
     border-radius: 12px; padding: 20px; text-align: center; margin-top: 16px;
   }
   .wa-notify-box p { font-size: 13px; color: var(--ink-soft); margin: 6px 0 14px; }
+
+  /* ─── UPI Payment Modal ─── */
+  .pay-tabs { display: flex; gap: 0; margin-bottom: 20px; border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .pay-tab {
+    flex: 1; padding: 10px; font-size: 13px; font-weight: 600;
+    border: none; background: var(--surface); cursor: pointer;
+    font-family: inherit; color: var(--ink-soft); transition: all 0.15s;
+  }
+  .pay-tab.active { background: var(--accent); color: white; }
+  .upi-qr-box {
+    background: white; border: 2px solid var(--border);
+    border-radius: 12px; padding: 20px; text-align: center;
+  }
+  .upi-qr-box img { width: 200px; height: 200px; margin: 0 auto 12px; display: block; }
+  .upi-id-display {
+    background: var(--surface-alt); padding: 8px 16px;
+    border-radius: 8px; font-size: 14px; font-weight: 600;
+    font-family: monospace; display: inline-block; margin: 8px 0;
+    letter-spacing: 0.5px;
+  }
+  .upi-steps { text-align: left; font-size: 12px; color: var(--ink-soft); margin-top: 14px; line-height: 1.8; }
+  .upi-steps span { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 99px; background: var(--accent); color: white; font-size: 10px; font-weight: 700; margin-right: 6px; }
 
   @media (max-width: 600px) {
     .hero h2 { font-size: 26px; }
@@ -1145,54 +1168,122 @@ export default function TutionHub() {
   // ─── Tutor Portal ───
   function TutorPortal() {
     const isUnlocked = (id) => tutorUnlocked.includes(id);
+    const [payTab, setPayTab] = useState("upi");
+
     const handlePay = (id) => {
+      setPayTab("upi");
       setModal(
         <Modal onClose={() => setModal(null)}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--warning-bg)", color: "var(--warning)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-              <Icon name="rupee" size={24} />
-            </div>
-            <h3>Unlock Query Details</h3>
-            <p style={{ fontSize: 14, color: "var(--ink-soft)", marginBottom: 20 }}>
-              Pay <strong>₹{TUTOR_UNLOCK_FEE}</strong> to see student contact info and full details for this query.
-            </p>
-            <div style={{ background: "var(--surface-alt)", padding: 14, borderRadius: 8, marginBottom: 20, fontSize: 13, textAlign: "left" }}>
-              <strong>Payment methods:</strong><br />
-              UPI · Google Pay · PhonePe · Bank Transfer<br />
-              <span style={{ color: "var(--ink-faint)" }}>Contact admin to complete payment</span>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setModal(null)}>Cancel</button>
-              <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => {
-                const options = {
-                  key: "rzp_test_TBmbDkHMOHnWLx",
-                  amount: 14900,
-                  currency: "INR",
-                  name: "TutionHub",
-                  description: "Unlock Student Query",
-                  handler: async (response) => {
-                    await supabase.from("unlocks").insert([{
-                      query_id: id,
-                      amount: TUTOR_UNLOCK_FEE,
-                      payment_id: response.razorpay_payment_id
-                    }]);
-                    setTutorUnlocked(u => [...u, id]);
-                    fetchUnlockCount();
-                    setModal(null);
-                    showToast("Payment successful! Query unlocked.");
-                  },
-                  theme: { color: "#2D5A27" }
-                };
-                const rzp = new window.Razorpay(options);
-                rzp.open();
-              }}>
-                <Icon name="unlock" size={16} /> Pay ₹149 to Unlock
-              </button>
-            </div>
-          </div>
+          <PayModal id={id} />
         </Modal>
       );
     };
+
+    function PayModal({ id }) {
+      const [tab, setTab] = useState("upi");
+      const [confirming, setConfirming] = useState(false);
+      const upiLink = `upi://pay?pa=${UPI_ID}&pn=TutionHub&am=${TUTOR_UNLOCK_FEE}&cu=INR&tn=TutionHub-Unlock-${id?.slice(0,8)}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+
+      const handleUpiDone = async () => {
+        setConfirming(true);
+        // Notify admin via WhatsApp about payment
+        const msg = `💰 *Payment Claim — TutionHub*\n\nA tutor claims to have paid ₹${TUTOR_UNLOCK_FEE} via UPI for query ID: ${id?.slice(0,8)}\n\nPlease verify in your UPI app and confirm.`;
+        openWhatsApp(ADMIN_WHATSAPP, msg);
+        // Optimistically unlock
+        await supabase.from("unlocks").insert([{
+          query_id: id,
+          amount: TUTOR_UNLOCK_FEE,
+          payment_id: "upi_manual_" + Date.now()
+        }]);
+        setTutorUnlocked(u => [...u, id]);
+        fetchUnlockCount();
+        setModal(null);
+        showToast("Payment sent! Query unlocked.");
+        setConfirming(false);
+      };
+
+      return (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--warning-bg)", color: "var(--warning)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+            <Icon name="rupee" size={24} />
+          </div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Unlock Query Details</h3>
+          <p style={{ fontSize: 14, color: "var(--ink-soft)", marginBottom: 16 }}>
+            Pay <strong>₹{TUTOR_UNLOCK_FEE}</strong> to see student contact info and full details.
+          </p>
+
+          <div className="pay-tabs">
+            <button className={`pay-tab ${tab === "upi" ? "active" : ""}`} onClick={() => setTab("upi")}>
+              UPI / QR Code
+            </button>
+            <button className={`pay-tab ${tab === "razorpay" ? "active" : ""}`} onClick={() => setTab("razorpay")}>
+              Card / Netbanking
+            </button>
+          </div>
+
+          {tab === "upi" ? (
+            <div className="upi-qr-box">
+              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", marginBottom: 10 }}>
+                Scan QR or tap to pay ₹{TUTOR_UNLOCK_FEE}
+              </p>
+              <img src={qrUrl} alt="UPI QR Code" style={{ borderRadius: 8 }} />
+              <div className="upi-id-display">{UPI_ID}</div>
+              <div className="upi-steps">
+                <p><span>1</span> Open Google Pay, PhonePe, or any UPI app</p>
+                <p><span>2</span> Scan the QR code or send ₹{TUTOR_UNLOCK_FEE} to the UPI ID above</p>
+                <p><span>3</span> Click "I've Paid" below after payment</p>
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setModal(null)}>Cancel</button>
+                <a href={upiLink} style={{ flex: 1, textDecoration: "none" }}>
+                  <button className="btn btn-primary" style={{ width: "100%", background: "#5F259F", borderColor: "#5F259F" }}>
+                    Open UPI App
+                  </button>
+                </a>
+              </div>
+              <button className="btn btn-primary" onClick={handleUpiDone} disabled={confirming} style={{ width: "100%", marginTop: 8 }}>
+                {confirming ? <><Icon name="loader" size={16} /> Confirming…</> : <><Icon name="check" size={16} /> I've Paid ₹{TUTOR_UNLOCK_FEE}</>}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 16 }}>
+                Pay securely via Razorpay — cards, netbanking, wallets & UPI.
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setModal(null)}>Cancel</button>
+                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => {
+                  const options = {
+                    key: "rzp_test_TBmbDkHMOHnWLx",
+                    amount: 14900,
+                    currency: "INR",
+                    name: "TutionHub",
+                    description: "Unlock Student Query",
+                    handler: async (response) => {
+                      await supabase.from("unlocks").insert([{
+                        query_id: id,
+                        amount: TUTOR_UNLOCK_FEE,
+                        payment_id: response.razorpay_payment_id
+                      }]);
+                      setTutorUnlocked(u => [...u, id]);
+                      fetchUnlockCount();
+                      setModal(null);
+                      showToast("Payment successful! Query unlocked.");
+                    },
+                    theme: { color: "#2D5A27" }
+                  };
+                  const rzp = new window.Razorpay(options);
+                  rzp.open();
+                }}>
+                  <Icon name="unlock" size={16} /> Pay ₹{TUTOR_UNLOCK_FEE}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
     const openQueries = queries.filter(q => q.status === "open");
     return (
       <div className="page">
