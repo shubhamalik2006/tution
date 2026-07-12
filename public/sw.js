@@ -1,4 +1,3 @@
-// TutionHub Service Worker — network-first, never cache auth/API
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {
   e.waitUntil(
@@ -12,6 +11,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request)
+      .then(r => r)
+      .catch(() => caches.match(e.request).then(r => r || new Response('Offline', { status: 503 })))
   );
 });
