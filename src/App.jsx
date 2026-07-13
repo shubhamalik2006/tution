@@ -1469,7 +1469,7 @@ export default function TutionHub() {
                 <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setModal(null)}>Cancel</button>
                 <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => {
                   const options = {
-                    key: "rzp_test_TBmbDkHMOHnWLx",
+                    key: "rzp_live_TCykYVAZL4m3a8",
                     amount: 14900,
                     currency: "INR",
                     name: "TutionHub",
