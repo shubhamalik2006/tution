@@ -1130,7 +1130,7 @@ export default function TutionHub() {
     );
   }
 
-  if (profile === null) {
+  if (profile === null && !isAdmin) {
     return (
       <>
         <style>{css}</style>
