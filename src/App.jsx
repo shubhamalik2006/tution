@@ -8,6 +8,10 @@ const supabase = createClient("https://kysjlotbqzgolirywtre.supabase.co", "sb_pu
   },
 });
 const ADMIN_PIN = "1234";
+const ADMINS = [
+  { email: "shubhamalik2006@gmail.com", phone: "9355575272" },
+  { email: "chiragmalik2000@gmail.com", phone: "9871395272" },
+];
 const TUTOR_UNLOCK_FEE = 149;
 const AREA = "Faridabad – 121001";
 const ADMIN_WHATSAPP = "919871395272";
@@ -455,6 +459,39 @@ const css = `
   }
   .wa-notify-box p { font-size: 13px; color: var(--ink-soft); margin: 6px 0 14px; }
 
+  /* ─── Onboarding Form ─── */
+  .onboard-page {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, #E8F0E7 0%, #FAFAF7 40%, #FEF7E6 100%);
+    padding: 20px;
+  }
+  .onboard-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 36px; max-width: 480px; width: 100%;
+    box-shadow: var(--shadow-lg);
+  }
+  .onboard-header { text-align: center; margin-bottom: 28px; }
+  .onboard-header .avatar-row {
+    display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px;
+  }
+  .onboard-header .avatar-row img {
+    width: 44px; height: 44px; border-radius: 99px; border: 2px solid var(--border);
+  }
+  .onboard-header h2 {
+    font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; margin-bottom: 4px;
+  }
+  .onboard-header p { font-size: 13px; color: var(--ink-soft); }
+  .role-selector { display: flex; gap: 8px; margin-bottom: 20px; }
+  .role-option {
+    flex: 1; padding: 16px 10px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    cursor: pointer; text-align: center; transition: all 0.15s; font-family: inherit;
+  }
+  .role-option:hover { border-color: var(--accent); }
+  .role-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .role-option .role-icon { font-size: 24px; margin-bottom: 6px; }
+  .role-option .role-name { font-size: 13px; font-weight: 700; }
+
   /* ─── UPI Payment Modal ─── */
   .pay-tabs { display: flex; gap: 0; margin-bottom: 20px; border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; }
   .pay-tab {
@@ -694,6 +731,136 @@ function LoginPage() {
   );
 }
 
+// ─── Onboarding Form ───
+function OnboardingForm({ user, onComplete }) {
+  const [form, setForm] = useState({
+    full_name: user.user_metadata?.full_name || "",
+    phone: "",
+    role: "",
+    class_level: "",
+    subjects: "",
+    area: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const valid = form.full_name && form.phone && form.role;
+
+  const handleSubmit = async () => {
+    if (!valid) return;
+    setSubmitting(true);
+    setError(null);
+
+    const profileData = {
+      id: user.id,
+      full_name: form.full_name,
+      phone: form.phone,
+      role: form.role,
+      class_level: form.class_level || null,
+      subjects: form.subjects || null,
+      area: form.area || null,
+    };
+
+    const { data, error: insertError } = await supabase
+      .from("profiles")
+      .insert([profileData])
+      .select()
+      .single();
+
+    if (insertError) {
+      setError(insertError.message);
+      setSubmitting(false);
+    } else {
+      // Notify admin about new complete signup
+      await insertNotification(
+        "new_signup",
+        `${form.full_name} completed signup`,
+        `Role: ${form.role} • Phone: ${form.phone} • Area: ${form.area || "Not specified"}${form.subjects ? ` • Subjects: ${form.subjects}` : ""}`,
+        { full_name: form.full_name, phone: form.phone, role: form.role, email: user.email }
+      );
+      // WhatsApp notify admin
+      const msg = `🎉 *New TutionHub Signup!*\n\n👤 ${form.full_name}\n📞 ${form.phone}\n🎭 Role: ${form.role}\n📧 ${user.email}${form.class_level ? `\n🎓 Class: ${form.class_level}` : ""}${form.subjects ? `\n📖 Subjects: ${form.subjects}` : ""}${form.area ? `\n📍 Area: ${form.area}` : ""}`;
+      openWhatsApp(ADMIN_WHATSAPP, msg);
+      onComplete(data);
+    }
+  };
+
+  const avatarUrl = user.user_metadata?.avatar_url;
+
+  return (
+    <div className="onboard-page">
+      <div className="onboard-card">
+        <div className="onboard-header">
+          <div className="avatar-row">
+            {avatarUrl && <img src={avatarUrl} alt="" referrerPolicy="no-referrer" />}
+            <div style={{ textAlign: "left" }}>
+              <h2>Welcome!</h2>
+              <p>{user.email}</p>
+            </div>
+          </div>
+          <p style={{ marginTop: 8 }}>Complete your profile to get started with TutionHub.</p>
+        </div>
+
+        {error && <div className="login-error">{error}</div>}
+
+        <div className="form-group">
+          <label className="form-label">Full Name *</label>
+          <input className="form-input" placeholder="Your full name" value={form.full_name} onChange={e => set("full_name", e.target.value)} />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Phone Number *</label>
+          <input className="form-input" type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={e => set("phone", e.target.value)} />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">I am a… *</label>
+          <div className="role-selector">
+            {[
+              { id: "student", icon: "🎓", label: "Student" },
+              { id: "parent", icon: "👨‍👩‍👧", label: "Parent" },
+              { id: "tutor", icon: "📚", label: "Tutor" },
+            ].map(r => (
+              <button key={r.id} className={`role-option ${form.role === r.id ? "selected" : ""}`} onClick={() => set("role", r.id)}>
+                <div className="role-icon">{r.icon}</div>
+                <div className="role-name">{r.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {(form.role === "student" || form.role === "parent") && (
+          <div className="form-group">
+            <label className="form-label">Class / Level</label>
+            <select className="form-select" value={form.class_level} onChange={e => set("class_level", e.target.value)}>
+              <option value="">Select class</option>
+              {CLASS_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        )}
+
+        <div className="form-group">
+          <label className="form-label">Subjects of Interest</label>
+          <input className="form-input" placeholder="e.g. Maths, Physics, English" value={form.subjects} onChange={e => set("subjects", e.target.value)} />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Area / Locality <span className="form-hint">(in Faridabad)</span></label>
+          <input className="form-input" placeholder="e.g. Sector 15, NIT, Ballabhgarh" value={form.area} onChange={e => set("area", e.target.value)} />
+        </div>
+
+        <button className="btn btn-primary" onClick={handleSubmit} disabled={!valid || submitting} style={{ width: "100%" }}>
+          {submitting ? <><Icon name="loader" size={16} /> Saving…</> : <><Icon name="check" size={16} /> Complete Profile</>}
+        </button>
+
+        <p style={{ textAlign: "center", fontSize: 11, color: "var(--ink-faint)", marginTop: 16, lineHeight: 1.6 }}>
+          Your information helps us match you with the right {form.role === "tutor" ? "students" : "tutors"} in Faridabad.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Notification Helpers ───
 async function insertNotification(type, title, body, meta = {}) {
   try {
@@ -790,26 +957,43 @@ export default function TutionHub() {
   const [unlockCount, setUnlockCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [profile, setProfile] = useState(undefined);
+
+  // Check if current user is admin
+  const isAdmin = ADMINS.some(a => user?.email === a.email || user?.phone?.includes(a.phone));
 
   const showToast = useCallback((msg) => setToast(msg), []);
 
+  // ─── Fetch Profile ───
+  const fetchProfile = useCallback(async (uid) => {
+    const { data, error } = await supabase.from("profiles").select("*").eq("id", uid).single();
+    if (error || !data) {
+      setProfile(null);
+    } else {
+      setProfile(data);
+    }
+  }, []);
+
   // ─── Auth State ───
   useEffect(() => {
-    // Check existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) fetchProfile(u.id);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+      if (currentUser) {
+        fetchProfile(currentUser.id);
+      } else {
+        setProfile(null);
+      }
 
-      // On first-time signup, create a notification for admin
       if (event === "SIGNED_IN" && currentUser) {
         const createdAt = new Date(currentUser.created_at).getTime();
         const now = Date.now();
-        // If account was created within the last 60 seconds, it's a new signup
         if (now - createdAt < 60000) {
           const name = currentUser.user_metadata?.full_name || currentUser.email;
           await insertNotification(
@@ -823,7 +1007,7 @@ export default function TutionHub() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchProfile]);
 
   // ─── Fetch queries from Supabase ───
   const fetchQueries = useCallback(async () => {
@@ -927,6 +1111,30 @@ export default function TutionHub() {
       <>
         <style>{css}</style>
         <LoginPage />
+      </>
+    );
+  }
+
+  // ─── Onboarding Gate ───
+  if (profile === undefined) {
+    return (
+      <>
+        <style>{css}</style>
+        <div className="login-page">
+          <div style={{ textAlign: "center", color: "var(--ink-soft)" }}>
+            <Icon name="loader" size={28} />
+            <p style={{ marginTop: 12, fontSize: 14 }}>Setting up your account…</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (profile === null) {
+    return (
+      <>
+        <style>{css}</style>
+        <OnboardingForm user={user} onComplete={(p) => setProfile(p)} />
       </>
     );
   }
@@ -1402,10 +1610,10 @@ export default function TutionHub() {
           <div className="nav-actions">
             <button className={`nav-btn ${view === "student" ? "active" : ""}`} onClick={() => setView("student")}><Icon name="search" size={14} /><span className="hide-mobile">Find Tutor</span></button>
             <button className={`nav-btn ${view === "tutor" ? "active" : ""}`} onClick={() => setView("tutor")}><Icon name="eye" size={14} /><span className="hide-mobile">Tutors</span></button>
-            <button className={`nav-btn ${view === "admin" || view === "admin-login" ? "active" : ""}`} onClick={() => setView(adminAuth ? "admin" : "admin-login")}><Icon name="shield" size={14} /></button>
+            <button className={`nav-btn ${view === "admin" || view === "admin-login" ? "active" : ""}`} onClick={() => { if (isAdmin) { setAdminAuth(true); setView("admin"); } else { setView(adminAuth ? "admin" : "admin-login"); } }}><Icon name="shield" size={14} /></button>
 
-            {/* Notification Bell — visible when admin is authenticated */}
-            {adminAuth && (
+            {/* Notification Bell — visible for admin */}
+            {(adminAuth || isAdmin) && (
               <button className="notif-bell" onClick={() => { setShowNotifPanel(true); }}>
                 <Icon name="bell" size={16} />
                 {unreadNotifCount > 0 && <span className="notif-badge">{unreadNotifCount > 9 ? "9+" : unreadNotifCount}</span>}
