@@ -700,6 +700,53 @@ const css = `
     transition: all 0.15s;
   }
   .footer-social a:hover { background: var(--accent-light); }
+
+  /* ─── Tutor Directory ─── */
+  .tutor-filters {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 20px; padding: 16px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px;
+  }
+  .tutor-filters select { flex: 1; min-width: 140px; }
+  .tutor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .tutor-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 22px; transition: all 0.2s;
+  }
+  .tutor-card:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .tutor-card-top { display: flex; gap: 14px; margin-bottom: 14px; }
+  .tutor-avatar {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: white; flex-shrink: 0;
+  }
+  .tutor-card-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .tutor-card-info .tutor-qual { font-size: 12px; color: var(--ink-soft); }
+  .tutor-card-info .tutor-exp {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: var(--accent-light); color: var(--accent);
+    padding: 2px 8px; border-radius: 99px; margin-top: 4px;
+  }
+  .tutor-card-subjects { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+  .tutor-card-subjects span {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 99px; background: var(--surface-alt);
+    color: var(--ink-soft);
+  }
+  .tutor-card-meta {
+    display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px;
+    color: var(--ink-soft); margin-bottom: 12px;
+    padding-top: 12px; border-top: 1px solid var(--border);
+  }
+  .tutor-card-meta span { display: flex; align-items: center; gap: 4px; }
+  .tutor-card-bio { font-size: 12px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 14px; }
+  .tutor-card-actions { display: flex; gap: 6px; }
+  .tutor-card-badge {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 10px; font-weight: 700; padding: 3px 10px;
+    border-radius: 99px; background: var(--success-bg); color: var(--success);
+  }
 `;
 
 // ─── Toast Component ───
@@ -917,6 +964,11 @@ function OnboardingForm({ user, onComplete }) {
     class_level: "",
     subjects: "",
     area: "",
+    experience: "",
+    qualification: "",
+    fee_range: "",
+    bio: "",
+    teaching_mode: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -936,6 +988,11 @@ function OnboardingForm({ user, onComplete }) {
       class_level: form.class_level || null,
       subjects: form.subjects || null,
       area: form.area || null,
+      experience: form.experience || null,
+      qualification: form.qualification || null,
+      fee_range: form.fee_range || null,
+      bio: form.bio || null,
+      teaching_mode: form.teaching_mode || null,
     };
 
     const { data, error: insertError } = await supabase
@@ -948,15 +1005,13 @@ function OnboardingForm({ user, onComplete }) {
       setError(insertError.message);
       setSubmitting(false);
     } else {
-      // Notify admin about new complete signup
       await insertNotification(
         "new_signup",
         `${form.full_name} completed signup`,
         `Role: ${form.role} • Phone: ${form.phone} • Area: ${form.area || "Not specified"}${form.subjects ? ` • Subjects: ${form.subjects}` : ""}`,
         { full_name: form.full_name, phone: form.phone, role: form.role, email: user.email }
       );
-      // WhatsApp notify admin
-      const msg = `🎉 *New TutionHub Signup!*\n\n👤 ${form.full_name}\n📞 ${form.phone}\n🎭 Role: ${form.role}\n📧 ${user.email}${form.class_level ? `\n🎓 Class: ${form.class_level}` : ""}${form.subjects ? `\n📖 Subjects: ${form.subjects}` : ""}${form.area ? `\n📍 Area: ${form.area}` : ""}`;
+      const msg = `🎉 *New TutionHub Signup!*\n\n👤 ${form.full_name}\n📞 ${form.phone}\n🎭 Role: ${form.role}\n📧 ${user.email}${form.class_level ? `\n🎓 Class: ${form.class_level}` : ""}${form.subjects ? `\n📖 Subjects: ${form.subjects}` : ""}${form.area ? `\n📍 Area: ${form.area}` : ""}${form.experience ? `\n⏳ Exp: ${form.experience}` : ""}${form.fee_range ? `\n💰 Fee: ${form.fee_range}` : ""}`;
       openWhatsApp(ADMIN_WHATSAPP, msg);
       onComplete(data);
     }
@@ -1016,9 +1071,71 @@ function OnboardingForm({ user, onComplete }) {
           </div>
         )}
 
+        {form.role === "tutor" && (
+          <>
+            <div className="form-group">
+              <label className="form-label">Classes You Teach *</label>
+              <select className="form-select" value={form.class_level} onChange={e => set("class_level", e.target.value)}>
+                <option value="">Select class range</option>
+                {CLASS_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Qualification</label>
+              <input className="form-input" placeholder="e.g. B.Ed, M.Sc Physics, B.Tech" value={form.qualification} onChange={e => set("qualification", e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Teaching Experience</label>
+              <select className="form-select" value={form.experience} onChange={e => set("experience", e.target.value)}>
+                <option value="">Select experience</option>
+                <option value="0-1 years">0-1 years</option>
+                <option value="1-3 years">1-3 years</option>
+                <option value="3-5 years">3-5 years</option>
+                <option value="5-10 years">5-10 years</option>
+                <option value="10+ years">10+ years</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Fee Range (per month)</label>
+              <select className="form-select" value={form.fee_range} onChange={e => set("fee_range", e.target.value)}>
+                <option value="">Select range</option>
+                <option value="₹1,000-2,000">₹1,000 - 2,000</option>
+                <option value="₹2,000-4,000">₹2,000 - 4,000</option>
+                <option value="₹4,000-6,000">₹4,000 - 6,000</option>
+                <option value="₹6,000-10,000">₹6,000 - 10,000</option>
+                <option value="₹10,000+">₹10,000+</option>
+                <option value="Negotiable">Negotiable</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Teaching Mode</label>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {["Home Tuition", "Online", "Both"].map(t => (
+                  <button key={t} className={`filter-chip ${form.teaching_mode === t ? "active" : ""}`} onClick={() => set("teaching_mode", t)}>{t}</button>
+                ))}
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">About You <span className="form-hint">(brief intro for students)</span></label>
+              <textarea className="form-textarea" placeholder="e.g. Experienced Maths teacher with 5+ years of coaching for board exams. Specialized in CBSE & ICSE curriculum." value={form.bio} onChange={e => set("bio", e.target.value)} />
+            </div>
+          </>
+        )}
+
         <div className="form-group">
-          <label className="form-label">Subjects of Interest</label>
-          <input className="form-input" placeholder="e.g. Maths, Physics, English" value={form.subjects} onChange={e => set("subjects", e.target.value)} />
+          <label className="form-label">{form.role === "tutor" ? "Subjects You Teach *" : "Subjects of Interest"}</label>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+            {SUBJECTS.map(s => {
+              const selected = form.subjects.split(",").map(x => x.trim()).includes(s);
+              return (
+                <button key={s} className={`filter-chip ${selected ? "active" : ""}`} onClick={() => {
+                  const current = form.subjects ? form.subjects.split(",").map(x => x.trim()).filter(Boolean) : [];
+                  if (selected) set("subjects", current.filter(x => x !== s).join(", "));
+                  else set("subjects", [...current, s].join(", "));
+                }} style={{ fontSize: 11, padding: "4px 10px" }}>{s}</button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="form-group">
@@ -1135,6 +1252,7 @@ export default function TutionHub() {
   const [notifications, setNotifications] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [profile, setProfile] = useState(undefined);
+  const [tutors, setTutors] = useState([]);
 
   // Check if current user is admin
   const isAdmin = ADMINS.some(a => user?.email === a.email || user?.phone?.includes(a.phone));
@@ -1215,14 +1333,25 @@ export default function TutionHub() {
     if (data) setNotifications(data);
   }, []);
 
+  // ─── Fetch Tutors ───
+  const fetchTutors = useCallback(async () => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("role", "tutor")
+      .order("created_at", { ascending: false });
+    if (data) setTutors(data);
+  }, []);
+
   // ─── Load data on mount ───
   useEffect(() => {
     if (user) {
       fetchQueries();
       fetchUnlockCount();
       fetchNotifications();
+      fetchTutors();
     }
-  }, [user, fetchQueries, fetchUnlockCount, fetchNotifications]);
+  }, [user, fetchQueries, fetchUnlockCount, fetchNotifications, fetchTutors]);
 
   // ─── Real-time subscription ───
   useEffect(() => {
@@ -1727,6 +1856,119 @@ export default function TutionHub() {
   }
 
   // ─── Home ───
+  // ─── Browse Tutors ───
+  function BrowseTutors() {
+    const [subjectFilter, setSubjectFilter] = useState("");
+    const [classFilter, setClassFilter] = useState("");
+    const [modeFilter, setModeFilter] = useState("");
+    const avatarColors = ["#2D5A27", "#C4850C", "#2D5AA7", "#B8372D", "#7B2D8E", "#1A8A42"];
+
+    const filtered = tutors.filter(t => {
+      const matchSubject = !subjectFilter || (t.subjects && t.subjects.toLowerCase().includes(subjectFilter.toLowerCase()));
+      const matchClass = !classFilter || (t.class_level && t.class_level.includes(classFilter));
+      const matchMode = !modeFilter || (t.teaching_mode && (t.teaching_mode === modeFilter || t.teaching_mode === "Both"));
+      return matchSubject && matchClass && matchMode;
+    });
+
+    return (
+      <div className="page">
+        <button className="back-btn" onClick={goHome}>← Back to home</button>
+        <div className="page-header">
+          <h2>Browse Tutors</h2>
+          <p>Find the right tutor by subject, class, and teaching mode. {tutors.length} tutors registered.</p>
+        </div>
+
+        <div className="tutor-filters">
+          <select className="form-select" value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)}>
+            <option value="">All Subjects</option>
+            {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select className="form-select" value={classFilter} onChange={e => setClassFilter(e.target.value)}>
+            <option value="">All Classes</option>
+            {CLASS_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select className="form-select" value={modeFilter} onChange={e => setModeFilter(e.target.value)}>
+            <option value="">All Modes</option>
+            <option value="Home Tuition">Home Tuition</option>
+            <option value="Online">Online</option>
+          </select>
+          {(subjectFilter || classFilter || modeFilter) && (
+            <button className="btn btn-ghost btn-sm" onClick={() => { setSubjectFilter(""); setClassFilter(""); setModeFilter(""); }}>
+              <Icon name="x" size={14} /> Clear
+            </button>
+          )}
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <h4>{tutors.length === 0 ? "No tutors registered yet" : "No tutors match your filters"}</h4>
+            <p>{tutors.length === 0 ? "Be the first tutor to register on TutionHub!" : "Try changing your subject or class filter."}</p>
+            {tutors.length === 0 && (
+              <button className="btn btn-primary" onClick={() => setView("student")} style={{ marginTop: 12 }}>
+                <Icon name="send" size={14} /> Post a Query Instead
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <p style={{ fontSize: 13, color: "var(--ink-faint)", marginBottom: 14 }}>
+              Showing {filtered.length} tutor{filtered.length !== 1 ? "s" : ""}{subjectFilter ? ` for ${subjectFilter}` : ""}{classFilter ? ` in ${classFilter}` : ""}
+            </p>
+            <div className="tutor-grid">
+              {filtered.map((t, i) => {
+                const color = avatarColors[i % avatarColors.length];
+                const subjects = t.subjects ? t.subjects.split(",").map(s => s.trim()).filter(Boolean) : [];
+                return (
+                  <div key={t.id} className="tutor-card" style={{ position: "relative" }}>
+                    {t.available !== false && <div className="tutor-card-badge">Available</div>}
+                    <div className="tutor-card-top">
+                      <div className="tutor-avatar" style={{ background: color }}>
+                        {t.full_name?.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="tutor-card-info">
+                        <h4>{t.full_name}</h4>
+                        {t.qualification && <div className="tutor-qual">{t.qualification}</div>}
+                        {t.experience && <div className="tutor-exp">⏳ {t.experience}</div>}
+                      </div>
+                    </div>
+
+                    {subjects.length > 0 && (
+                      <div className="tutor-card-subjects">
+                        {subjects.map(s => <span key={s}>{s}</span>)}
+                      </div>
+                    )}
+
+                    {t.bio && <div className="tutor-card-bio">{t.bio}</div>}
+
+                    <div className="tutor-card-meta">
+                      {t.class_level && <span>🎓 {t.class_level}</span>}
+                      {t.area && <span><Icon name="mapPin" size={12} /> {t.area}</span>}
+                      {t.fee_range && <span><Icon name="rupee" size={12} /> {t.fee_range}</span>}
+                      {t.teaching_mode && <span>🏠 {t.teaching_mode}</span>}
+                    </div>
+
+                    <div className="tutor-card-actions">
+                      <button className="btn btn-primary btn-sm" onClick={() => setView("student")}>
+                        <Icon name="send" size={12} /> Request This Tutor
+                      </button>
+                      <button className="wa-btn" onClick={() => {
+                        const msg = `Hi! I found you on TutionHub. I'm interested in ${subjects[0] || "tuition"} classes. Are you available?`;
+                        const phone = t.phone?.replace(/\s/g, "").startsWith("+") ? t.phone.replace(/[^0-9]/g, "") : "91" + t.phone?.replace(/[^0-9]/g, "");
+                        openWhatsApp(phone, msg);
+                      }}>
+                        <Icon name="whatsapp" size={12} /> WhatsApp
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
   function Home() {
     const subjectIcons = [
       { name: "Mathematics", emoji: "📐" }, { name: "Physics", emoji: "⚛️" },
@@ -1965,6 +2207,7 @@ export default function TutionHub() {
           </div>
           <div className="nav-actions">
             <button className={`nav-btn ${view === "student" ? "active" : ""}`} onClick={() => setView("student")}><Icon name="search" size={14} /><span className="hide-mobile">Find Tutor</span></button>
+            <button className={`nav-btn ${view === "browse" ? "active" : ""}`} onClick={() => setView("browse")}><Icon name="user" size={14} /><span className="hide-mobile">Browse</span></button>
             <button className={`nav-btn ${view === "tutor" ? "active" : ""}`} onClick={() => setView("tutor")}><Icon name="eye" size={14} /><span className="hide-mobile">Tutors</span></button>
             <button className={`nav-btn ${view === "admin" || view === "admin-login" ? "active" : ""}`} onClick={() => { if (isAdmin) { setAdminAuth(true); setView("admin"); } else { setView(adminAuth ? "admin" : "admin-login"); } }}><Icon name="shield" size={14} /></button>
 
@@ -1995,6 +2238,7 @@ export default function TutionHub() {
         {view === "admin-login" && !adminAuth && <AdminLogin />}
         {(view === "admin" && adminAuth) && <AdminDash />}
         {view === "tutor" && <TutorPortal />}
+        {view === "browse" && <BrowseTutors />}
 
         {modal}
         {toast && <Toast message={toast} onClose={() => setToast(null)} />}
