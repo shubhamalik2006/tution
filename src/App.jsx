@@ -522,7 +522,184 @@ const css = `
     .login-card { padding: 32px 24px; }
     .notif-panel { width: 100vw; }
     .user-menu-btn span { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .how-steps { flex-direction: column; }
+    .how-step-line { display: none; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .subjects-grid { grid-template-columns: repeat(3, 1fr); }
+    .stats-banner { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
   }
+
+  /* ─── Enhanced Hero ─── */
+  .hero-illustration {
+    display: flex; gap: 12px; justify-content: center;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .hero-float {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--ink-soft);
+    box-shadow: var(--shadow-sm);
+    animation: float 3s ease-in-out infinite;
+  }
+  .hero-float:nth-child(2) { animation-delay: 0.5s; }
+  .hero-float:nth-child(3) { animation-delay: 1s; }
+  .hero-float .hf-icon { font-size: 20px; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* ─── Stats Banner ─── */
+  .stats-banner {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    padding: 28px 0;
+  }
+  .stat-pill {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 20px; text-align: center;
+    transition: all 0.2s;
+  }
+  .stat-pill:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .stat-pill .sp-num {
+    font-size: 32px; font-weight: 800; font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-pill .sp-label { font-size: 12px; color: var(--ink-soft); margin-top: 2px; font-weight: 500; }
+
+  /* ─── Features Section ─── */
+  .section-header {
+    text-align: center; margin-bottom: 28px; padding-top: 36px;
+  }
+  .section-header h3 {
+    font-family: 'Playfair Display', serif; font-size: 24px;
+    font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px;
+  }
+  .section-header p { font-size: 14px; color: var(--ink-soft); }
+  .section-tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-bottom: 32px;
+  }
+  .feature-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 24px 20px;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .feature-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .feature-card .fc-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 14px;
+  }
+  .feature-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feature-card p { font-size: 12px; color: var(--ink-soft); line-height: 1.55; }
+
+  /* ─── How It Works ─── */
+  .how-steps {
+    display: flex; align-items: flex-start; gap: 0; padding: 8px 0 36px;
+    position: relative;
+  }
+  .how-step {
+    flex: 1; text-align: center; padding: 0 12px; position: relative;
+  }
+  .how-step-num {
+    width: 40px; height: 40px; border-radius: 99px;
+    background: var(--accent); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; margin: 0 auto 12px;
+    position: relative; z-index: 2;
+  }
+  .how-step-line {
+    position: absolute; top: 20px; left: 55%; right: -45%;
+    height: 2px; background: var(--border); z-index: 1;
+  }
+  .how-step:last-child .how-step-line { display: none; }
+  .how-step h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .how-step p { font-size: 12px; color: var(--ink-soft); line-height: 1.45; }
+  .how-step .hs-emoji { font-size: 28px; margin-bottom: 8px; }
+
+  /* ─── Subjects Grid ─── */
+  .subjects-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 32px;
+  }
+  .subject-chip {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 10px; text-align: center;
+    transition: all 0.2s; cursor: default;
+  }
+  .subject-chip:hover { border-color: var(--accent); background: var(--accent-light); }
+  .subject-chip .sc-emoji { font-size: 24px; margin-bottom: 6px; }
+  .subject-chip .sc-name { font-size: 12px; font-weight: 600; }
+
+  /* ─── Testimonials ─── */
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-bottom: 32px;
+  }
+  .testimonial-card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 22px 20px;
+    position: relative;
+  }
+  .testimonial-card .tc-stars { color: #F5A623; font-size: 14px; margin-bottom: 10px; letter-spacing: 2px; }
+  .testimonial-card .tc-text { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 14px; font-style: italic; }
+  .testimonial-card .tc-author { display: flex; align-items: center; gap: 10px; }
+  .testimonial-card .tc-avatar {
+    width: 36px; height: 36px; border-radius: 99px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+  .testimonial-card .tc-name { font-size: 13px; font-weight: 700; }
+  .testimonial-card .tc-role { font-size: 11px; color: var(--ink-faint); }
+
+  /* ─── CTA Banner ─── */
+  .cta-banner {
+    background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+    border-radius: 16px; padding: 36px 28px; text-align: center;
+    margin: 8px 0 32px; color: white;
+  }
+  .cta-banner h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .cta-banner p { font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
+  .cta-banner .btn { background: white; color: var(--accent); border: none; }
+  .cta-banner .btn:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+
+  /* ─── Footer ─── */
+  .footer {
+    border-top: 1.5px solid var(--border); padding: 32px 0 20px;
+    margin-top: 12px;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    gap: 28px; margin-bottom: 24px;
+  }
+  .footer-brand h4 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .footer-brand p { font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
+  .footer-col h5 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .footer-col a { display: block; font-size: 12px; color: var(--ink-soft); text-decoration: none; margin-bottom: 6px; transition: color 0.15s; }
+  .footer-col a:hover { color: var(--accent); }
+  .footer-bottom {
+    border-top: 1px solid var(--border); padding-top: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--ink-faint);
+  }
+  .footer-social { display: flex; gap: 10px; }
+  .footer-social a {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--surface-alt); display: flex;
+    align-items: center; justify-content: center;
+    text-decoration: none; font-size: 14px;
+    transition: all 0.15s;
+  }
+  .footer-social a:hover { background: var(--accent-light); }
 `;
 
 // ─── Toast Component ───
@@ -1551,9 +1728,22 @@ export default function TutionHub() {
 
   // ─── Home ───
   function Home() {
+    const subjectIcons = [
+      { name: "Mathematics", emoji: "📐" }, { name: "Physics", emoji: "⚛️" },
+      { name: "Chemistry", emoji: "🧪" }, { name: "Biology", emoji: "🧬" },
+      { name: "English", emoji: "📝" }, { name: "Hindi", emoji: "🕉️" },
+      { name: "Computer Science", emoji: "💻" }, { name: "Economics", emoji: "📊" },
+    ];
+
     return (
       <>
+        {/* ─── Hero ─── */}
         <div className="hero">
+          <div className="hero-illustration">
+            <div className="hero-float"><span className="hf-icon">📚</span> 100+ Tutors</div>
+            <div className="hero-float"><span className="hf-icon">⭐</span> 4.8 Rating</div>
+            <div className="hero-float"><span className="hf-icon">📍</span> Faridabad</div>
+          </div>
           <div className="hero-badge"><Icon name="mapPin" size={14} /> Serving {AREA}</div>
           <h2>Your Trusted <em>Tution</em><br />Marketplace</h2>
           <p>Students find the right tutor. Tutors find the right students. One platform, one neighbourhood.</p>
@@ -1563,6 +1753,15 @@ export default function TutionHub() {
           </div>
         </div>
 
+        {/* ─── Stats Banner ─── */}
+        <div className="stats-banner">
+          <div className="stat-pill"><div className="sp-num">500+</div><div className="sp-label">Students Helped</div></div>
+          <div className="stat-pill"><div className="sp-num">100+</div><div className="sp-label">Verified Tutors</div></div>
+          <div className="stat-pill"><div className="sp-num">15+</div><div className="sp-label">Subjects</div></div>
+          <div className="stat-pill"><div className="sp-num">4.8⭐</div><div className="sp-label">Average Rating</div></div>
+        </div>
+
+        {/* ─── Role Cards ─── */}
         <div className="role-cards">
           <div className="role-card" onClick={() => setView("student")}>
             <div className="role-card-icon" style={{ background: "var(--accent-light)", color: "var(--accent)" }}><Icon name="search" size={24} /></div>
@@ -1574,18 +1773,175 @@ export default function TutionHub() {
             <h3>I'm a Tutor</h3>
             <p>Browse open student queries near you. Pay a small fee to unlock contact details and apply directly.</p>
           </div>
-          <div className="role-card" onClick={() => setView("admin-login")}>
+          <div className="role-card" onClick={() => setView(isAdmin ? "admin" : "admin-login")}>
             <div className="role-card-icon" style={{ background: "var(--surface-alt)", color: "var(--ink-soft)" }}><Icon name="shield" size={24} /></div>
             <h3>Admin Panel</h3>
             <p>Manage all queries, track tutor payments, and control the platform. Admin-only access.</p>
           </div>
         </div>
 
-        <div className="divider" />
-        <div style={{ textAlign: "center", padding: "8px 0 24px" }}>
-          <p style={{ fontSize: 13, color: "var(--ink-faint)" }}>
-            <strong style={{ color: "var(--ink-soft)" }}>How it works:</strong> Student posts query → Admin reviews → Tutor pays ₹{TUTOR_UNLOCK_FEE} to unlock → Tutor contacts student directly
-          </p>
+        {/* ─── How It Works ─── */}
+        <div className="section-header">
+          <div className="section-tag">Simple Process</div>
+          <h3>How TutionHub Works</h3>
+          <p>From posting a requirement to finding the perfect tutor — in 4 easy steps.</p>
+        </div>
+        <div className="how-steps">
+          <div className="how-step">
+            <div className="hs-emoji">📝</div>
+            <div className="how-step-num">1</div>
+            <div className="how-step-line" />
+            <h4>Post Requirement</h4>
+            <p>Tell us the subject, class, timing & area. It takes 30 seconds.</p>
+          </div>
+          <div className="how-step">
+            <div className="hs-emoji">🔍</div>
+            <div className="how-step-num">2</div>
+            <div className="how-step-line" />
+            <h4>We Review</h4>
+            <p>Our team reviews and matches you with the best tutors nearby.</p>
+          </div>
+          <div className="how-step">
+            <div className="hs-emoji">🤝</div>
+            <div className="how-step-num">3</div>
+            <div className="how-step-line" />
+            <h4>Tutor Connects</h4>
+            <p>Verified tutors unlock your query and reach out directly.</p>
+          </div>
+          <div className="how-step">
+            <div className="hs-emoji">🎓</div>
+            <div className="how-step-num">4</div>
+            <h4>Start Learning</h4>
+            <p>Begin classes at home or online. Track progress and grow!</p>
+          </div>
+        </div>
+
+        {/* ─── Features ─── */}
+        <div className="section-header">
+          <div className="section-tag">Why Choose Us</div>
+          <h3>Built for Faridabad Families</h3>
+          <p>Everything you need to find the perfect tutor, all in one place.</p>
+        </div>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="fc-icon" style={{ background: "#E8F0E7" }}>✅</div>
+            <h4>Verified Tutors</h4>
+            <p>Every tutor goes through a verification process. We check experience, qualifications, and background.</p>
+          </div>
+          <div className="feature-card">
+            <div className="fc-icon" style={{ background: "#FEF7E6" }}>📍</div>
+            <h4>Hyperlocal Matching</h4>
+            <p>We match you with tutors in your locality — Sector 15, NIT, Ballabhgarh, Old Faridabad & more.</p>
+          </div>
+          <div className="feature-card">
+            <div className="fc-icon" style={{ background: "#E6F0FE" }}>💸</div>
+            <h4>Free for Students</h4>
+            <p>Students and parents never pay us anything. Post your requirement completely free of cost.</p>
+          </div>
+          <div className="feature-card">
+            <div className="fc-icon" style={{ background: "#FDE8E6" }}>⚡</div>
+            <h4>Fast Response</h4>
+            <p>Get matched with a tutor within 24 hours. WhatsApp notifications keep you updated instantly.</p>
+          </div>
+          <div className="feature-card">
+            <div className="fc-icon" style={{ background: "#F3E8FE" }}>🏠</div>
+            <h4>Home & Online</h4>
+            <p>Choose what works for you — home tuition, online classes, group batches, or crash courses.</p>
+          </div>
+          <div className="feature-card">
+            <div className="fc-icon" style={{ background: "#E8F8EE" }}>🔒</div>
+            <h4>Safe & Secure</h4>
+            <p>Your data is encrypted with Supabase. Payments are processed securely via Razorpay.</p>
+          </div>
+        </div>
+
+        {/* ─── Subjects ─── */}
+        <div className="section-header">
+          <div className="section-tag">We Cover</div>
+          <h3>All Subjects, All Levels</h3>
+          <p>From Nursery to 12th, competitive exams to graduation — we've got tutors for everything.</p>
+        </div>
+        <div className="subjects-grid">
+          {subjectIcons.map(s => (
+            <div key={s.name} className="subject-chip">
+              <div className="sc-emoji">{s.emoji}</div>
+              <div className="sc-name">{s.name}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ─── Testimonials ─── */}
+        <div className="section-header">
+          <div className="section-tag">What People Say</div>
+          <h3>Trusted by Parents & Students</h3>
+        </div>
+        <div className="testimonials-grid">
+          <div className="testimonial-card">
+            <div className="tc-stars">★★★★★</div>
+            <div className="tc-text">"Found an amazing Maths tutor for my son within 2 days. He went from 45 to 89 in board exams. Highly recommend TutionHub!"</div>
+            <div className="tc-author">
+              <div className="tc-avatar" style={{ background: "#E8F0E7", color: "var(--accent)" }}>R</div>
+              <div><div className="tc-name">Rajesh Kumar</div><div className="tc-role">Parent, Sector 15</div></div>
+            </div>
+          </div>
+          <div className="testimonial-card">
+            <div className="tc-stars">★★★★★</div>
+            <div className="tc-text">"As a tutor, I used to struggle finding students. TutionHub sends me 3-4 queries every week. Best platform for teachers!"</div>
+            <div className="tc-author">
+              <div className="tc-avatar" style={{ background: "#FEF7E6", color: "var(--warning)" }}>P</div>
+              <div><div className="tc-name">Priya Sharma</div><div className="tc-role">Physics Tutor, NIT</div></div>
+            </div>
+          </div>
+          <div className="testimonial-card">
+            <div className="tc-stars">★★★★★</div>
+            <div className="tc-text">"My daughter needed help with Chemistry for NEET. Got a great tutor in Ballabhgarh. The whole process was smooth and quick."</div>
+            <div className="tc-author">
+              <div className="tc-avatar" style={{ background: "#E6F0FE", color: "#2D5AA7" }}>A</div>
+              <div><div className="tc-name">Anita Gupta</div><div className="tc-role">Parent, Ballabhgarh</div></div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── CTA Banner ─── */}
+        <div className="cta-banner">
+          <h3>Ready to Find Your Perfect Tutor?</h3>
+          <p>Join 500+ students and parents in Faridabad who trust TutionHub.</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="btn" onClick={() => setView("student")}><Icon name="search" size={16} /> Find a Tutor — Free</button>
+            <a className="btn" href={`https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent("Hi TutionHub! I need help finding a tutor in Faridabad.")}`} target="_blank" rel="noopener noreferrer" style={{ background: "rgba(255,255,255,0.2)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)", textDecoration: "none" }}>
+              <Icon name="whatsapp" size={16} /> Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        {/* ─── Footer ─── */}
+        <div className="footer">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <h4>TutionHub</h4>
+              <p>Faridabad's trusted tuition marketplace. Connecting students with the best home tutors since 2025. Serving Sector 15, NIT, Ballabhgarh, Old Faridabad & more.</p>
+            </div>
+            <div className="footer-col">
+              <h5>Quick Links</h5>
+              <a href="#" onClick={(e) => { e.preventDefault(); setView("student"); }}>Find a Tutor</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setView("tutor"); }}>Tutor Portal</a>
+              <a href={`https://wa.me/${ADMIN_WHATSAPP}`} target="_blank" rel="noopener noreferrer">Contact Us</a>
+            </div>
+            <div className="footer-col">
+              <h5>Subjects</h5>
+              <a href="#">Maths Tutor</a>
+              <a href="#">Science Tutor</a>
+              <a href="#">English Tutor</a>
+              <a href="#">Board Exam Prep</a>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>© 2025 TutionHub. Made with ❤️ in Faridabad</span>
+            <div className="footer-social">
+              <a href={`https://wa.me/${ADMIN_WHATSAPP}`} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={16} /></a>
+              <a href="#"><Icon name="mapPin" size={16} /></a>
+            </div>
+          </div>
         </div>
       </>
     );
